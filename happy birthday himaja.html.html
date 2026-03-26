@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Birthday Wish 💖</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: sans-serif;
+    overflow-x: hidden;
+}
+
+/* Pink animated background */
+#page1, #page3 {
+    background: linear-gradient(270deg, #ffd1dc, #ffe4e1, #ffc0cb);
+    background-size: 600% 600%;
+    animation: gradientMove 12s ease infinite;
+}
+
+/* Black fireworks page */
+#page2 {
+    background: black;
+}
+
+@keyframes gradientMove {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+.page {
+    display: none;
+    min-height: 100vh;
+    padding: 20px;
+    text-align: center;
+}
+
+.active { display: block; }
+
+h1 {
+    font-size: 7vw;
+    color: #ff4b5c;
+}
+
+input, button {
+    width: 80%;
+    max-width: 300px;
+    padding: 12px;
+    margin-top: 10px;
+    font-size: 18px;
+    border-radius: 10px;
+    border: none;
+}
+
+button {
+    background: #ff4b5c;
+    color: white;
+}
+
+canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+}
+
+/* Message */
+#message {
+    margin-top: 20px;
+    font-size: 4.5vw;
+    line-height: 1.6;
+    white-space: pre-line;
+    color: #333;
+}
+
+.note {
+    font-size: 5vw;
+    margin-top: 20px;
+    color: #ff2e63;
+}
+
+/* 💜 Heart */
+.heart {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    font-size: 40px;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="page active" id="page1">
+    <h1>Enter Your Name 💖</h1>
+    <input type="text" id="nameInput" placeholder="Your Name">
+    <button onclick="startWish()">Enter</button>
+</div>
+
+<div class="page" id="page2">
+    <canvas id="canvas"></canvas>
+</div>
+
+<div class="page" id="page3">
+    <div class="heart">💜</div>
+    <h1 id="title"></h1>
+    <div id="message"></div>
+    <div class="note">💝 You are the best sister ever! 💝</div>
+</div>
+
+<script>
+let name = "";
+let animationId;
+
+function startWish() {
+    name = document.getElementById("nameInput").value;
+    if (!name) return alert("Enter name!");
+
+    switchPage("page1","page2");
+    startFireworks();
+
+    setTimeout(() => {
+        cancelAnimationFrame(animationId);
+        switchPage("page2","page3");
+        document.getElementById("title").innerText = "Happy Birthday, " + name + " 🎉";
+        typeMessage();
+    }, 3000);
+}
+
+function switchPage(a,b){
+    document.getElementById(a).classList.remove("active");
+    document.getElementById(b).classList.add("active");
+}
+
+/* 🎆 Fireworks */
+function startFireworks(){
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    let particles = [];
+
+    function createFirework(){
+        let cx = Math.random() * canvas.width;
+        let cy = Math.random() * canvas.height / 2;
+
+        let colors = ["rgb(255,105,180)", "rgb(138,43,226)"];
+        let color = colors[Math.floor(Math.random()*colors.length)];
+
+        for(let t = 0; t < Math.PI * 2; t += 0.25){
+            let x = 16 * Math.pow(Math.sin(t), 3);
+            let y = -(13 * Math.cos(t) - 5*Math.cos(2*t) - 2*Math.cos(3*t) - Math.cos(4*t));
+
+            particles.push({
+                x: cx,
+                y: cy,
+                dx: x * 0.2,
+                dy: y * 0.2,
+                life: 50,
+                color: color
+            });
+        }
+    }
+
+    function animate(){
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+
+        particles.forEach((p,i)=>{
+            ctx.fillStyle = p.color;
+            ctx.fillRect(p.x,p.y,2,2);
+
+            p.x += p.dx;
+            p.y += p.dy;
+            p.life--;
+
+            if(p.life <= 0) particles.splice(i,1);
+        });
+
+        animationId = requestAnimationFrame(animate);
+    }
+
+    let interval = setInterval(createFirework, 200);
+
+    setTimeout(() => {
+        clearInterval(interval);
+    }, 3000);
+
+    animate();
+}
+
+/* ✅ FIXED Typing */
+function typeMessage(){
+let text = ("Dear " + name + `,
+
+On your special day, I just want to tell you how much you mean to me.
+You are not just my sister, but also my best friend, my support system, and my biggest happiness.
+
+Your smile makes everything better, and your presence fills my life with joy and love.
+I am so lucky to have a sister like you.
+
+May your life be filled with endless happiness, success, and beautiful moments.
+Keep shining and spreading your kindness everywhere.
+
+Happy Birthday once again! 🎂❤️`);
+
+    let i=0;
+    let el = document.getElementById("message");
+    el.textContent = ""; // clear safely
+
+    function typing(){
+        if(i<text.length){
+            el.textContent += text.charAt(i); // ✅ safe
+            i++;
+            setTimeout(typing,25);
+        }
+    }
+    typing();
+}
+</script>
+
+</body>
+</html>
